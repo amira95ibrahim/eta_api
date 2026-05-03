@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   
       while (true) {
         const response = await fetch(
-          `https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=50&pageNo=${page}`,
+         // `https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=50&pageNo=${page}`,
+             `https://api.invoicing.eta.gov.eg/api/v1.0/documents/recent`,
           {
             headers: {
               Authorization: "Bearer " + token,
