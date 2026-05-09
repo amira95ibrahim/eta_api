@@ -1,6 +1,5 @@
-export default async function handler(req, res) {
+// export default async function handler(req, res) {
 
-    return process.env.CLIENT_ID;
   // try {
 
   //   const tokenResponse = await fetch(
@@ -76,4 +75,12 @@ export default async function handler(req, res) {
   //   });
 
   // }
+// }
+
+export default async function handler(req, res) {
+
+  return res.status(200).json({
+    clientId: process.env.CLIENT_ID
+  });
+
 }
