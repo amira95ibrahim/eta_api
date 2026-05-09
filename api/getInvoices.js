@@ -20,8 +20,7 @@
 
   //   const text = await tokenResponse.text();
 
-  //   console.log("TOKEN STATUS:", tokenResponse.status);
-  //   console.log("TOKEN RAW:", text);
+  
 
   //   if (!tokenResponse.ok) {
   //     return res.status(tokenResponse.status).json({
@@ -95,6 +94,12 @@ export default async function handler(req, res) {
       }
     );
 
+       if (!tokenResponse.ok) {
+      return res.status(tokenResponse.status).json({
+        error: "Token request failed",
+        raw: text,
+      });
+    }
     const text = await tokenResponse.text();
   return res.status(200).json({
     clientId: process.env.CLIENT_ID,
