@@ -1,9 +1,7 @@
 export default async function handler(req, res) {
+
   try {
 
-    // ------------------------------------------------------------------
-    // 1️⃣ GET ACCESS TOKEN FROM ETA
-    // ------------------------------------------------------------------
     const tokenResponse = await fetch(
       "https://id.eta.gov.eg/connect/token",
       {
@@ -19,49 +17,61 @@ export default async function handler(req, res) {
         }),
       }
     );
+  return tokenResponse.text() ;
+    const text = await tokenResponse.text();
 
-    const tokenData = await tokenResponse.json();
+    console.log("TOKEN STATUS:", tokenResponse.status);
+    console.log("TOKEN RAW:", text);
 
-    if (!tokenData.access_token) {
-      return res.status(401).json({
-        error: "Failed to get token",
-        details: tokenData,
+    if (!tokenResponse.ok) {
+      return res.status(tokenResponse.status).json({
+        error: "Token request failed",
+        raw: text,
+      });
+    }
+
+    let tokenData;
+
+    try {
+      tokenData = JSON.parse(text);
+    } catch (e) {
+      return res.status(500).json({
+        error: "Token response مش JSON",
+        raw: text,
       });
     }
 
     const token = tokenData.access_token;
 
-    // ------------------------------------------------------------------
-    // 2️⃣ FETCH INVOICES
-    // ------------------------------------------------------------------
-    let allInvoices = [];
-    let page = 1;
-
-    while (true) {
-      const response = await fetch(
-        `https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=50&pageNo=${page}`,
-        {
-          headers: {
-            Authorization: "Bearer " + token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!data.result || data.result.length === 0) break;
-
-      allInvoices = allInvoices.concat(data.result);
-      page++;
+    if (!token) {
+      return res.status(401).json({
+        error: "No access token returned",
+        data: tokenData,
+      });
     }
 
-    // ------------------------------------------------------------------
-    // 3️⃣ RETURN RESULT
-    // ------------------------------------------------------------------
-    return res.status(200).json(allInvoices);
+    const response = await fetch(
+      "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+
+    const dataText = await response.text();
+
+    console.log("ETA STATUS:", response.status);
+    console.log("ETA RAW:", dataText);
+
+    return res.status(200).send(dataText);
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+
+    return res.status(500).json({
+      error: err.message,
+      stack: err.stack,
+    });
+
   }
 }
