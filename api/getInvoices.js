@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         }),
       }
     );
-  return tokenResponse.text() ;
+
     const text = await tokenResponse.text();
 
     console.log("TOKEN STATUS:", tokenResponse.status);
@@ -30,45 +30,46 @@ export default async function handler(req, res) {
       });
     }
 
-    let tokenData;
+    // let tokenData;
 
-    try {
-      tokenData = JSON.parse(text);
-    } catch (e) {
-      return res.status(500).json({
-        error: "Token response مش JSON",
-        raw: text,
-      });
-    }
+    // try {
+    //   tokenData = JSON.parse(text);
+    // } catch (e) {
+    //   return res.status(500).json({
+    //     error: "Token response مش JSON",
+    //     raw: text,
+    //   });
+    // }
 
-    const token = tokenData.access_token;
+    // const token = tokenData.access_token;
 
-    if (!token) {
-      return res.status(401).json({
-        error: "No access token returned",
-        data: tokenData,
-      });
-    }
+    // if (!token) {
+    //   return res.status(401).json({
+    //     error: "No access token returned",
+    //     data: tokenData,
+    //   });
+    // }
 
-    const response = await fetch(
-      "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
+    // const response = await fetch(
+    //   "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
+    //   {
+    //     headers: {
+    //       Authorization: "Bearer " + token,
+    //     },
+    //   }
+    // );
 
-    const dataText = await response.text();
+    // const dataText = await response.text();
 
-    console.log("ETA STATUS:", response.status);
-    console.log("ETA RAW:", dataText);
+    // console.log("ETA STATUS:", response.status);
+    // console.log("ETA RAW:", dataText);
 
-    return res.status(200).send(dataText);
+    // return res.status(200).send(dataText);
 
   } catch (err) {
 
     return res.status(500).json({
+
       error: err.message,
       stack: err.stack,
     });
