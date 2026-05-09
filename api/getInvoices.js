@@ -79,8 +79,27 @@
 
 export default async function handler(req, res) {
 
+     const tokenResponse = await fetch(
+      "https://id.eta.gov.eg/connect/token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          client_id: process.env.CLIENT_ID,
+          client_secret: process.env.CLIENT_SECRET,
+          scope: "InvoicingAPI",
+        }),
+      }
+    );
+
+    const text = await tokenResponse.text();
   return res.status(200).json({
-    clientId: process.env.CLIENT_ID
+    clientId: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    response : text
   });
 
 }
