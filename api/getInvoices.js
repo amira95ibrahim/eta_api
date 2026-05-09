@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     // ------------------------------------------------
     // RETURN JSON
     // ------------------------------------------------
-    return res.status(200).json(data);
+    return res.status(200).text(data);
 
   } catch (err) {
 
