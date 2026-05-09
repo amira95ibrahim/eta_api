@@ -1,84 +1,8 @@
-// export default async function handler(req, res) {
-
-  // try {
-
-  //   const tokenResponse = await fetch(
-  //     "https://id.eta.gov.eg/connect/token",
-  //     {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/x-www-form-urlencoded",
-  //       },
-  //       body: new URLSearchParams({
-  //         grant_type: "client_credentials",
-  //         client_id: process.env.CLIENT_ID,
-  //         client_secret: process.env.CLIENT_SECRET,
-  //         scope: "InvoicingAPI",
-  //       }),
-  //     }
-  //   );
-
-  //   const text = await tokenResponse.text();
-
-  
-
-  //   if (!tokenResponse.ok) {
-  //     return res.status(tokenResponse.status).json({
-  //       error: "Token request failed",
-  //       raw: text,
-  //     });
-  //   }
-
-  //   let tokenData;
-
-  //   try {
-  //     tokenData = JSON.parse(text);
-  //   } catch (e) {
-  //     return res.status(500).json({
-  //       error: "Token response مش JSON",
-  //       raw: text,
-  //     });
-  //   }
-
-  //   const token = tokenData.access_token;
-
-  //   if (!token) {
-  //     return res.status(401).json({
-  //       error: "No access token returned",
-  //       data: tokenData,
-  //     });
-  //   }
-
-  //   const response = await fetch(
-  //     "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
-  //     {
-  //       headers: {
-  //         Authorization: "Bearer " + token,
-  //       },
-  //     }
-  //   );
-
-  //   const dataText = await response.text();
-
-  //   console.log("ETA STATUS:", response.status);
-  //   console.log("ETA RAW:", dataText);
-
-  //   return res.status(200).send(dataText);
-
-  // } catch (err) {
-
-  //   return res.status(500).json({
-
-  //     error: err.message,
-  //     stack: err.stack,
-  //   });
-
-  // }
-// }
-
 export default async function handler(req, res) {
 
-     const tokenResponse = await fetch(
+  try {
+
+    const tokenResponse = await fetch(
       "https://id.eta.gov.eg/connect/token",
       {
         method: "POST",
@@ -94,17 +18,60 @@ export default async function handler(req, res) {
       }
     );
 
-       if (!tokenResponse.ok) {
+    const text = await tokenResponse.text();
+
+  
+
+    if (!tokenResponse.ok) {
       return res.status(tokenResponse.status).json({
         error: "Token request failed",
         raw: text,
       });
     }
-    const text = await tokenResponse.text();
-  return res.status(200).json({
-    clientId: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    response : text
-  });
 
+    let tokenData;
+
+    try {
+      tokenData = JSON.parse(text);
+    } catch (e) {
+      return res.status(500).json({
+        error: "Token response مش JSON",
+        raw: text,
+      });
+    }
+
+    const token = tokenData.access_token;
+
+    if (!token) {
+      return res.status(401).json({
+        error: "No access token returned",
+        data: tokenData,
+      });
+    }
+
+    // const response = await fetch(
+    //   "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
+    //   {
+    //     headers: {
+    //       Authorization: "Bearer " + token,
+    //     },
+    //   }
+    // );
+
+    // const dataText = await response.text();
+
+
+    return res.status(200).send(dataText,token);
+
+  } catch (err) {
+
+    return res.status(500).json({
+
+      error: err.message,
+      stack: err.stack,
+    });
+
+  }
 }
+
+
