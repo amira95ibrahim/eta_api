@@ -2,6 +2,9 @@ export default async function handler(req, res) {
 
   try {
 
+    // ------------------------------------------------
+    // GET TOKEN
+    // ------------------------------------------------
     const tokenResponse = await fetch(
       "https://id.eta.gov.eg/connect/token",
       {
@@ -18,60 +21,40 @@ export default async function handler(req, res) {
       }
     );
 
-    const text = await tokenResponse.text();
+    const tokenData = await tokenResponse.json();
 
-  
-
-    if (!tokenResponse.ok) {
-      return res.status(tokenResponse.status).json({
-        error: "Token request failed",
-        raw: text,
-      });
-    }
-
-    let tokenData;
-
-    try {
-      tokenData = JSON.parse(text);
-    } catch (e) {
-      return res.status(500).json({
-        error: "Token response مش JSON",
-        raw: text,
-      });
-    }
-
-    const token = tokenData.access_token;
-
-    if (!token) {
+    if (!tokenData.access_token) {
       return res.status(401).json({
-        error: "No access token returned",
+        error: "No access token",
         data: tokenData,
       });
     }
 
+    // ------------------------------------------------
+    // FETCH INVOICES
+    // ------------------------------------------------
     const response = await fetch(
       "https://api.invoicing.eta.gov.eg/v1.0/documents/recent",
       {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: "Bearer " + tokenData.access_token,
         },
       }
     );
 
-    const dataText = await response.text();
+    const data = await response.json();
 
-
-    return res.status(200).send(dataText);
+    // ------------------------------------------------
+    // RETURN JSON
+    // ------------------------------------------------
+    return res.status(200).json(data);
 
   } catch (err) {
 
     return res.status(500).json({
-
       error: err.message,
       stack: err.stack,
     });
 
   }
 }
-
-
