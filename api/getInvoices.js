@@ -49,19 +49,19 @@ export default async function handler(req, res) {
       });
     }
 
-    // const response = await fetch(
-    //   "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
-    //   {
-    //     headers: {
-    //       Authorization: "Bearer " + token,
-    //     },
-    //   }
-    // );
+    const response = await fetch(
+      "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=5&pageNo=1",
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
 
-    // const dataText = await response.text();
+    const dataText = await response.text();
 
 
-    return res.status(200).send(dataText,token);
+    return res.status(200).send(dataText);
 
   } catch (err) {
 
