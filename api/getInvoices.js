@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     const dataText = await response.text();
 
 
-    return res.status(200).send(response,token);
+    return res.status(200).send(token);
 
   } catch (err) {
 
