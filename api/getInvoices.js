@@ -16,15 +16,12 @@ export default async function handler(req, res) {
           grant_type: "client_credentials",
           client_id: process.env.CLIENT_ID,
           client_secret: process.env.CLIENT_SECRET,
-          scope: "InvoicingAPI",
+          scope: "Mcs.Invoicing.Api",
         }),
       }
     );
 
     const tokenText = await tokenResponse.text();
-
-    console.log("TOKEN STATUS:", tokenResponse.status);
-    console.log("TOKEN TEXT:", tokenText);
 
     if (!tokenResponse.ok) {
       return res.status(tokenResponse.status).json({
@@ -54,45 +51,29 @@ export default async function handler(req, res) {
     }
 
     // ---------------------------------------------------
-    // GET INVOICES
+    // GET RECENT INVOICES
     // ---------------------------------------------------
- const response = await fetch(
-  "https://api.invoicing.eta.gov.eg/api/v1.0/documents/recent?pageSize=100&pageNo=1",
-  {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + token,
-      Accept: "application/json",
-      "Accept-Language": "en",
-    },
-  }
-);
-
-
+    const response = await fetch(
+      "https://api.invoicing.eta.gov.eg/api/v1.0/documents/recent?pageSize=20&pageNo=1",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          Accept: "application/json",
+          "Accept-Language": "en",
+        },
+      }
+    );
 
     const responseText = await response.text();
 
-    console.log("ETA STATUS:", response.status);
-    console.log("ETA RESPONSE:", responseText);
-
     if (!response.ok) {
+      return res.status(response.status).json({
+        error: "ETA request failed",
+        raw: responseText,
+      });
+    }
 
-  return res.status(response.status).json({
-
-    error: "ETA request failed",
-
-    status: response.status,
-    statusText: response.statusText,
-
-    headers: Object.fromEntries(response.headers.entries()),
-
-    raw: responseText,
-  });
-}
-
-    // ---------------------------------------------------
-    // PARSE JSON SAFELY
-    // ---------------------------------------------------
     let data;
 
     try {
@@ -105,9 +86,58 @@ export default async function handler(req, res) {
     }
 
     // ---------------------------------------------------
+    // GET DETAILS FOR EACH INVOICE
+    // ---------------------------------------------------
+    const invoices = data.result || [];
+
+    const detailedInvoices = [];
+
+    for (const invoice of invoices) {
+
+      try {
+
+        const detailsResponse = await fetch(
+          `https://api.invoicing.eta.gov.eg/api/v1.0/documents/${invoice.uuid}/raw`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + token,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        const detailsText = await detailsResponse.text();
+
+        let detailsData = {};
+
+        try {
+          detailsData = JSON.parse(detailsText);
+        } catch {
+          detailsData = {};
+        }
+
+        detailedInvoices.push({
+          ...invoice,
+          details: detailsData,
+        });
+
+      } catch (e) {
+
+        detailedInvoices.push({
+          ...invoice,
+          detailsError: e.message,
+        });
+      }
+    }
+
+    // ---------------------------------------------------
     // RETURN RESULT
     // ---------------------------------------------------
-    return res.status(200).json(data);
+    return res.status(200).json({
+      total: detailedInvoices.length,
+      result: detailedInvoices,
+    });
 
   } catch (err) {
 
