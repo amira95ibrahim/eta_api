@@ -16,7 +16,7 @@ export default async function handler(req, res) {
           grant_type: "client_credentials",
           client_id: process.env.CLIENT_ID,
           client_secret: process.env.CLIENT_SECRET,
-          scope: "Mcs.Invoicing.Api",
+          scope: "InvoicingAPI",
         }),
       }
     );
