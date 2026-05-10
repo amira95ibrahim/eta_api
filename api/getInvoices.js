@@ -56,18 +56,18 @@ export default async function handler(req, res) {
     // ---------------------------------------------------
     // GET INVOICES
     // ---------------------------------------------------
-   const response = await fetch(
-  "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=10&pageNo=1",
+ const response = await fetch(
+  "https://api.invoicing.eta.gov.eg/api/v1.0/documents/recent?pageSize=10&pageNo=1",
   {
     method: "GET",
     headers: {
       Authorization: "Bearer " + token,
       Accept: "application/json",
       "Accept-Language": "en",
-      "User-Agent": "Mozilla/5.0",
     },
   }
 );
+
 
 
     const responseText = await response.text();
