@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     // FETCH INVOICES
     // ------------------------------------------------
     const response = await fetch(
-      "https://api.invoicing.eta.gov.eg/v1.0/documents/recent",
+      "https://api.invoicing.eta.gov.eg/api/v1/documents?pageSize=10&pageNo=1",
       {
         headers: {
           Authorization: "Bearer " + tokenData.access_token,
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await response.raw();
+    const data = await response.json();
 
     // ------------------------------------------------
     // RETURN JSON
